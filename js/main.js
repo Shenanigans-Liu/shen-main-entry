@@ -46,30 +46,38 @@
     function inits() {
       preloadMedia();
       initEvents();
-      preloadEnd();    
+      preloadEnd();
     }
     
     //preload media  
-    function preloadMedia() {
-      $(".loadMore").html("<i class='fa fa-spinner fa-pulse fa-3x fa-fw'></i><span class='sr-only'>Loading...</span>");    
-      let folder = "images/photography/";
+    function preloadMedia() {    
+      let dir = "https://shenliu-main.s3.amazonaws.com?prefix=images/photography/&delimiter=/";
+      let parser = new DOMParser();
+      let xmlSerializer = new XMLSerializer();    
+      let rex = /\w+\/\w+\/p\d+\.jpe?g|png|gif/; //regular expression e.g images/photography/p10.jpg
       $.ajax({
-        url : folder,
-        success: function (images) {
-          $(images).find("a").attr("href", function (i, img) {
-            if( img.match(/\.(jpe?g|png|gif)$/) ) { 
-              $("#photo-list").append( '<div class="grid-item"><a href="' + img + '"><img alt="photography" class="wrap-img" src="' + img + '"></a></div>' );
+        url: dir,
+        success: function (doc) {
+          //S3 will return xml file for the provided directory, need to parse xml file to get photo path.    
+          //parsing xml file to get photo path    
+          var data = xmlSerializer.serializeToString(doc);    
+          let xmlDoc = parser.parseFromString(data, "text/xml");   
+          let collections = xmlDoc.getElementsByTagName("Key"); //HTMLCollections
+          for (let i = 0; i < collections.length; i++) {
+            if (rex.test(collections[i].innerHTML)) {  
+              $("#photo-list").append($('<div class="grid-item"><a href="' + collections[i].innerHTML + '"><img alt="photography" class="wrap-img" src="' + collections[i].innerHTML + '"></a></div>'));
             }
-          });
+          }    
             
           //display first four photography and smart rearrange   
-          $(".grid-item:hidden").slice(0, 4).show(function() {
+          $(".grid-item:hidden").slice(0,4).show(function() {
+          //masonry
             $('.grid').masonry({
               itemSelector: '.grid-item',
             });
-            $(".loadMore").html("<p style='font-size:11pt; font-weight:500;'>Load More<br><i class='fa fa-angle-double-down fa-2x' aria-hidden='true'></i></p>");    
-          });
-            
+             
+          });  
+
           //initializing photo gallery
           $('.photography a').magnificPopup({
             type: 'image',
@@ -79,7 +87,7 @@
           });
         }
       });    
-    }  
+    }
 
     function initEvents() {
       openbtn.addEventListener( 'click', toggleMenu );
@@ -96,12 +104,12 @@
       });
         
       // set video volume
-      $("video").prop("volume", 0.3);
+      //$("video").prop("volume", 0.3);
     }
     
     function preloadEnd() {
       $("#status").fadeOut(); // will first fade out the loading animation
-      $("#preloader").delay(450).fadeOut("slow"); // will fade out the white DIV that covers the website.
+      $("#preloader").delay(300).fadeOut("slow"); // will fade out the white DIV that covers the website.
     }
       
       
@@ -159,11 +167,12 @@
       });
     });
       
-      
+    
+    // load more photography  
     $(".loadMore").on('click', function (e) {
         e.preventDefault();
         $(".loadMore").html("<i class='fa fa-spinner fa-pulse fa-3x fa-fw'></i><span class='sr-only'>Loading...</span>");
-        $(".grid-item:hidden").slice(0, 5).show(function() {
+        $(".grid-item:hidden").slice(0,5).show(function() {
             //masonry
             $('.grid').masonry({
               itemSelector: '.grid-item',
@@ -176,12 +185,11 @@
     });
     
       
-    // project toggle event
-    $(".project-img-loading").html("<i class='fa fa-spinner fa-pulse fa-3x fa-fw'></i><span class='sr-only'>Loading...</span>");  
+    // project toggle event  
     $("#workTab0").click(function(e) {
       e.preventDefault();
       let parentElement = "#fullstack-img";
-      let childElement = '<a target="_blank" href="https://www.shen-confusion.com"><img alt="full stack" src="images/fullstack.png"></a>';    
+      let childElement = '<a target="_blank" href="https://confusion.supshen.com"><img alt="full stack" src="images/fullstack.png"></a>';    
       lazyLoadImg(parentElement, childElement);
       $("#workContent0").slideToggle(600);
       $("#workContent1").slideUp(500);

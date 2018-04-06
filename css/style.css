@@ -446,7 +446,7 @@ p {
 
 /*----------------------------------------- 6) Jumbotron ------------------------------------------*/
 #home {
-  background: url('../images/p1.jpg');
+  background: url('../images/background.jpg');
   -webkit-background-size: cover;
   -ms-background-size: cover;
   -moz-background-size: cover;
