@@ -941,7 +941,7 @@ ul.portfolio-image .workContent {
 }
 .grid:after {
   content: '';
-  display: block;
+  display: inline-block;
   clear: both;
 }
 .grid-item {

@@ -47,45 +47,44 @@
       preloadMedia();
       initEvents();
       preloadEnd();
-      console.log("inititalizing finish");    
     }
     
     //preload media  
     function preloadMedia() {    
-      let dir = "/images/photography" //testing purpose 
-      //let dir = "https://shenliu-main.s3.amazonaws.com?prefix=images/photography/&delimiter=/"; //s3 bucket
+      //let dir = "/images/photography" //testing purpose 
+      let dir = "https://shenliu-main.s3.amazonaws.com?prefix=images/photography/&delimiter=/"; //s3 bucket
       let parser = new DOMParser();
       let xmlSerializer = new XMLSerializer();    
       let rex = /\w+\/\w+\/p\d+\.jpe?g|png|gif/; //regular expression e.g images/photography/p10.jpg
-      
-      //display first four photography and smart rearrange    
-      $(".grid-item:hidden").slice(0,4).show(function() {
-        //masonry
-        $('.grid').masonry({
-          itemSelector: '.grid-item',
-        });
-      });
         
       $.ajax({
         url: dir,
         success: function (doc) {
           //S3 will return xml file for the provided directory, need to parse xml file to get photo path.    
           //parsing xml file to get photo path    
-          /*var data = xmlSerializer.serializeToString(doc);    
+          var data = xmlSerializer.serializeToString(doc);    
           let xmlDoc = parser.parseFromString(data, "text/xml");   
           let collections = xmlDoc.getElementsByTagName("Key"); //HTMLCollections
           for (let i = 0; i < collections.length; i++) {
             if (rex.test(collections[i].innerHTML)) {  
               $("#photo-list").append($('<div class="grid-item"><a href="' + collections[i].innerHTML + '"><img alt="photography" class="wrap-img" src="' + collections[i].innerHTML + '"></a></div>'));
             }
-          }*/
+          }
                
           // For testing purpose    
-          $(doc).find("a:contains(.jpg)").each(function () {
+          /*$(doc).find("a:contains(.jpg)").each(function () {
               var filename = this.href.replace(window.location.host, "").replace("http://", "");
               $("#photo-list").append($('<div class="grid-item"><a href="' + filename + '"><img alt="photography" class="wrap-img" src="' + filename + '"></a></div>'));
-          });
+          });*/
           
+          //display first four photography and smart rearrange    
+          $(".grid-item:hidden").slice(0,4).show(function() {
+            //masonry
+            $('.grid').masonry({
+              itemSelector: '.grid-item',
+            });
+          });
+            
           //load more button ready
           $(".loadMore").html("<p style='font-size:11pt; font-weight:500;'>Load More<br><i class='fa fa-angle-double-down fa-2x' aria-hidden='true'></i></p>");
 
